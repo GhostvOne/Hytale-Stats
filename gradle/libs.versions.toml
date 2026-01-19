@@ -1,0 +1,16 @@
+[versions]
+kotlin = "2.3.0"
+kotlinxSerialization = "1.9.0"
+
+[plugins]
+#le plugin va avec la lib il permet a l'ide de mieux comprendre
+kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+[libraries]
+kotlinxSerializationJson = { group="org.jetbrains.kotlinx", name="kotlinx-serialization-json", version.ref="kotlinxSerialization" }
+
+[bundles]
+kotlinx-ecosystem = [
+    #     reference to libraries -> kotlinxSerializationJson
+    "kotlinxSerializationJson"
+]
