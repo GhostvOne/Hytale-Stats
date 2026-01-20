@@ -1,39 +1,22 @@
 package gg.forgeone.hytaleStats.entities
 
-class PlayerStat {
-    var kills: Int = 0
-    var deaths: Int = 0
-    var receivedDamages: Long = 0
-    var sentDamages: Long = 0
-    var harvest: Int = 0
-    var distanceTraveled: Int = 0
+import java.util.*
 
-    fun addDamage(damage: Long) {
-        receivedDamages += damage
+class PlayerStat(uuid1: UUID) {
+    private var uuid: String = ""
+
+    val damages = PlayerStatDamages()
+    val deaths = PlayerStatDeaths()
+    val kills = PlayerStatKills()
+    val distances = PlayerStatDistances()
+    val harvests = PlayerStatHarvests()
+
+    init {
+        uuid = uuid1.toString()
     }
 
-    fun addDistance(distance: Int) {
-        distanceTraveled += distance
-    }
-
-    fun addKill() {
-        kills++
-    }
-
-    fun addDeath() {
-        deaths++
-    }
-
-    fun addHarvest() {
-        harvest++
-    }
-
-    fun reset() {
-        kills = 0
-        deaths = 0
-        receivedDamages = 0
-        sentDamages = 0
-        harvest = 0
-        distanceTraveled = 0
+    // Vous pouvez ajouter des méthodes globales ici si nécessaire
+    fun resetAll() {
+        // Logique de reset
     }
 }
