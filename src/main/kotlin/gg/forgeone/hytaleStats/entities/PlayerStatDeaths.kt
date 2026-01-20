@@ -1,28 +1,17 @@
 package gg.forgeone.hytaleStats.entities
 
+import java.util.UUID
 import kotlin.time.Instant
 
-class PlayerStatDeaths {
-    private var _deaths: Int = 0
-    private var _lastDeath: Instant? = null
-    private var _lastCauseOfDeath: String? = null
+data class PlayerDeathContext(
+    val playerUuid: UUID,
+    val playerName: String,
+    val worldName: String,
+    val cause: String?,
+    val killer: KillerInfo?
+)
 
-    fun initWithDeath(cause: String? = null) {
-        val time = Instant.now()
-        _deaths = 1
-        _lastDeath = Instant.now()
-        _lastCauseOfDeath = cause
-    }
-
-    fun addDeath(cause: String? = null) {
-        _deaths++
-        _lastDeath = Instant.now()
-        _lastCauseOfDeath = cause
-    }
-
-    fun reset() {
-        _deaths = 0
-        _lastDeath = 0
-        _lastCauseOfDeath = null
-    }
+sealed class KillerInfo {
+    data class Player(val uuid: UUID, val name: String) : KillerInfo()
+    data class Npc(val typeId: String) : KillerInfo()
 }

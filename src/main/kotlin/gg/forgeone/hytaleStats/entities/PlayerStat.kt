@@ -6,7 +6,6 @@ class PlayerStat(uuid1: UUID) {
     private var uuid: String = ""
 
     val damages = PlayerStatDamages()
-    val deaths = PlayerStatDeaths()
     val kills = PlayerStatKills()
     val distances = PlayerStatDistances()
     val harvests = PlayerStatHarvests()
