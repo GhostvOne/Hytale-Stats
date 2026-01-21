@@ -1,41 +1,52 @@
-package gg.forgeone.hytaleStats.listeners
+package gg.forgeone.hytaleStats.system
 
 import com.hypixel.hytale.component.CommandBuffer
-import com.hypixel.hytale.component.ComponentRegistryProxy
 import com.hypixel.hytale.component.Ref
 import com.hypixel.hytale.component.Store
+import com.hypixel.hytale.component.query.Query
+import com.hypixel.hytale.server.core.Message
+import com.hypixel.hytale.server.core.entity.entities.Player
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathComponent
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathSystems
-import com.hypixel.hytale.server.core.universe.PlayerRef
+import com.hypixel.hytale.server.core.universe.Universe
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
-import gg.forgeone.hytaleStats.Main
-import gg.forgeone.hytaleStats.services.PlayerDeathService
+import gg.forgeone.hytaleStats.utils.LogUtils
+import gg.forgeone.hytaleStats.utils.PlayerMessageUtils
 
-// https://hytalemodding.dev/en/docs/guides/plugin/player-death-event
-class PlayerDeathListener(
-    private val service: PlayerDeathService
-) {
+open class PlayerDeathListener : DeathSystems.OnDeathSystem() {
 
-    fun register(registry: ComponentRegistryProxy<EntityStore>) {
-        registry.registerSystem(PlayerDeathSystem())
+    override fun getQuery(): Query<EntityStore> {
+        // On ne traite que les entités qui sont des joueurs
+        return Query.and(Player.getComponentType())
     }
 
-    private inner class PlayerDeathSystem : DeathSystems.OnDeathSystem() {
+    override fun onComponentAdded(
+        ref: Ref<EntityStore>,
+        deathComponent: DeathComponent,
+        store: Store<EntityStore>,
+        commandBuffer: CommandBuffer<EntityStore>
+    ) {
+        // Ici c'est le vrai point d'entrée ECS
+        onDeath(ref, store, commandBuffer, deathComponent)
+    }
 
-        override fun getQuery() =
-            PlayerRef.getComponentType()
+    protected fun onDeath(
+        ref: Ref<EntityStore>,
+        store: Store<EntityStore>,
+        commandBuffer: CommandBuffer<EntityStore>,
+        deathComponent: DeathComponent
+    ) {
+        val player = store.getComponent(ref, Player.getComponentType())
+            ?: return
 
-        override fun onComponentAdded(
-            ref: Ref<EntityStore>,
-            component: DeathComponent,
-            store: Store<EntityStore>,
-            commandBuffer: CommandBuffer<EntityStore>
-        ) {
-            val playerRef =
-                store.getComponent(ref, PlayerRef.getComponentType())
-                    ?: return
+        PlayerMessageUtils.broadcast("${player.displayName} est mort")
 
-            service.handleDeath(playerRef, component, store)
+        deathComponent.deathCause.let { deathCause ->
+            LogUtils.debug("$deathCause")
+            PlayerMessageUtils.broadcast("${player.displayName} mort à cause de $deathCause")
+        }
+        deathComponent.deathInfo?.let { damage ->
+            PlayerMessageUtils.broadcast("Cause : ${damage.amount} dégâts")
         }
     }
 }
